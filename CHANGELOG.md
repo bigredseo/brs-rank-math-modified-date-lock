@@ -2,6 +2,11 @@
 
 For full technical details, see [TECHNICAL-CHANGELOG.md](TECHNICAL-CHANGELOG.md).
 
+## 1.2.1
+
+- Updated the installation and update documentation for packaged GitHub releases.
+- Added a link to the complete usage guide on the Big Red SEO website.
+
 ## 1.2.0
 
 - Added automatic update support for releases published in the plugin’s public GitHub repository.

@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Rank Math Modified Date Lock
- * Plugin URI: https://github.com/bigredseo/brs-rank-math-modified-date-lock
+ * Plugin URI: https://www.bigredseo.com/rankmath-modified-date-lock-default/
  * Description: A WordPress plugin to lock the modified date of posts and pages when using Rank Math SEO.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Big Red SEO
  * Author URI: https://www.bigredseo.com/
  * Text Domain: brs-rank-math-modified-date-lock
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BRS_RANK_MATH_MODIFIED_DATE_LOCK_VERSION', '1.2.0' );
+define( 'BRS_RANK_MATH_MODIFIED_DATE_LOCK_VERSION', '1.2.1' );
 define( 'BRS_RANK_MATH_MODIFIED_DATE_LOCK_FILE', __FILE__ );
 
 if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
@@ -31,7 +31,7 @@ if ( class_exists( 'BRS_Public_GitHub_Updater' ) ) {
 			'slug'        => 'brs-rank-math-modified-date-lock',
 			'name'        => 'Rank Math Modified Date Lock',
 			'author'      => 'Big Red SEO',
-			'homepage'    => 'https://github.com/bigredseo/brs-rank-math-modified-date-lock',
+			'homepage'    => 'https://www.bigredseo.com/rankmath-modified-date-lock-default/',
 		)
 	);
 }

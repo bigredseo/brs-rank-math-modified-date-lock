@@ -1,64 +1,98 @@
 # Rank Math Modified Date Lock
 
-A WordPress plugin to lock the modified date of posts and pages when using Rank Math SEO.
+A free WordPress plugin that automatically enables Rank Math SEO’s **Lock Modified Date** option when the block editor loads.
 
-By default, Rank Math's **Lock Modified Date** toggle in the WordPress block editor is OFF. Rank Math does not currently provide a built-in setting to change this default.
+This helps prevent minor edits from unintentionally changing the modified date displayed or recorded for a post or page.
 
-This plugin sets the toggle to ON each time the editor loads, then disconnects immediately so the user can still manually unlock it for that save if needed.
+## How It Works
 
-## Why
+Rank Math includes a **Lock Modified Date** setting, but the setting is normally disabled each time the editor loads.
 
-Rank Math's **Lock Modified Date** toggle prevents WordPress from updating a post's modified date when you save minor changes. That can be useful for SEO and content management when you do not want a small edit, image swap, typo fix, or layout adjustment treated like a meaningful content update.
+This plugin enables that setting automatically.
 
-However, Rank Math does not currently provide a setting to make this toggle ON by default. That means editors have to remember to enable it before saving minor updates.
-
-This plugin removes that friction by setting **Lock Modified Date** to ON when the editor loads, while still allowing the user to manually turn it OFF for any save where the modified date should be updated.
+Editors can still disable **Lock Modified Date** before saving when an edit should update the modified date. The plugin only changes the default state; it does not prevent editors from changing it.
 
 ## Requirements
 
-* WordPress 5.0+ (block editor)
-* Rank Math SEO plugin, active
-* WordPress 6.5+ recommended, so the `Requires Plugins` header can prevent activation without Rank Math present. On earlier versions, an activation check handles this instead.
+* WordPress
+* Rank Math SEO
+* The WordPress block editor
 
-## File Structure
-
-```
-brs-rank-math-modified-date-lock/
-├── brs-rank-math-modified-date-lock.php
-├── includes/
-│   ├── activation-check.php
-│   └── editor-assets.php
-└── assets/
-    └── js/
-        └── lock-modified-date.js
-```
+Rank Math SEO must be installed and active before this plugin can be activated.
 
 ## Installation
 
-Upload the `brs-rank-math-modified-date-lock` folder to your `wp-content/plugins/` directory, or zip the folder and upload it through **Plugins > Add New > Upload Plugin** in the WordPress admin. Activate it like any other plugin.
+### Install the Released Plugin
 
-Rank Math SEO must be installed and active first. On WordPress 6.5+, the Activate link is disabled until Rank Math is active. On earlier versions, activating without Rank Math active will automatically deactivate this plugin and show an explanation.
+1. Open the repository’s **Releases** page on GitHub.
+2. Download the ZIP file attached to the latest release:
+   `brs-rank-math-modified-date-lock.zip`
+3. In WordPress, go to **Plugins → Add New Plugin**.
+4. Select **Upload Plugin**.
+5. Choose the downloaded ZIP file.
+6. Select **Install Now**.
+7. Activate **Rank Math Modified Date Lock**.
 
-## Behavior
+Do not download GitHub’s automatically generated **Source code** ZIP files. Use the packaged plugin ZIP attached to the release.
 
-* Runs on post edit screens, including posts, pages, and custom post types.
-* Does nothing if Rank Math is not active.
-* Fires once per editor load.
-* Disconnects as soon as the toggle is found and checked.
-* Leaves the toggle alone if it is already checked.
-* Does not interfere with the user manually unlocking the date for a given save.
-* If Rank Math is deactivated later while this plugin remains active, this plugin deactivates itself and shows an admin notice explaining why.
+## Updating
 
-## Notes
+The plugin checks its public GitHub repository for published releases and integrates available updates with the standard WordPress plugin update system.
 
-This works by observing the editor DOM for Rank Math's **Lock Modified Date** toggle, then clicking it if unchecked.
+When a newer release is available, the update appears in:
 
-This is not a Rank Math API integration. If Rank Math or WordPress changes the block editor markup in a future release, this plugin may need to be updated.
+* **Dashboard → Updates**
+* The WordPress **Plugins** screen
+* WordPress automatic-update controls, when automatic updates are enabled
 
-## Author
+No separate updater plugin or GitHub account is required.
 
-Built and maintained by [Big Red SEO](https://www.bigredseo.com), a WordPress development and SEO company in Omaha, Nebraska.
+## Usage
+
+After activation:
+
+1. Open a post or page in the WordPress block editor.
+2. Locate Rank Math’s modified-date setting.
+3. The **Lock Modified Date** option will be enabled automatically.
+4. Leave it enabled for minor edits that should not change the modified date.
+5. Disable it before saving when the modified date should be updated.
+
+The plugin has no separate settings screen.
+
+## More Information
+
+Read the full explanation, including why modified dates matter and when the lock should be disabled:
+
+[Stop Rank Math From Updating Your Modified Date by Default](https://www.bigredseo.com/rankmath-modified-date-lock-default/)
+
+## Support
+
+Use the repository’s GitHub issue tracker to report a reproducible plugin defect.
+
+For general WordPress, Rank Math, website-development, or SEO assistance, visit [Big Red SEO](https://www.bigredseo.com/).
+
+## Development
+
+The plugin uses published GitHub releases for distribution.
+
+Each release must include a packaged ZIP asset named:
+
+```text
+brs-rank-math-modified-date-lock.zip
+```
+
+The ZIP must extract into this directory:
+
+```text
+brs-rank-math-modified-date-lock/
+```
+
+GitHub’s automatically generated source-code archives are not used for WordPress updates.
 
 ## License
 
-GPL-2.0-or-later
+This plugin is licensed under GPL-2.0-or-later.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for user-facing changes and [TECHNICAL-CHANGELOG.md](TECHNICAL-CHANGELOG.md) for implementation details.

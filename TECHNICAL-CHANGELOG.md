@@ -2,6 +2,14 @@
 
 Detailed, developer-facing change history. For a plain-language summary, see [CHANGELOG.md](CHANGELOG.md).
 
+## 1.2.1
+
+- Replaced the previous manual installation instructions in `README.md` with installation instructions for the packaged release ZIP.
+- Documented the plugin’s automatic GitHub release update support.
+- Documented the required release asset filename and plugin directory structure.
+- Added links to the public Big Red SEO usage guide and the project changelog files.
+- Changed the plugin’s public-facing homepage to the Big Red SEO usage guide while retaining the GitHub repository as its `Update URI`.
+
 ## 1.2.0
 
 - Added `includes/class-brs-public-github-updater.php`.
@@ -13,7 +21,6 @@ Detailed, developer-facing change history. For a plain-language summary, see [CH
 - Added support for WordPress’s external plugin update and plugin-information APIs.
 - Added transient caching for GitHub release responses and temporary caching for failed API requests.
 - Added compatibility behavior allowing the embedded updater to coexist with the BRS central GitHub update manager.
-
 
 ## [1.1.2] - 2026-08-04
 ### Changed
