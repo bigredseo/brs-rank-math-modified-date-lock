@@ -2,6 +2,11 @@
 
 For full technical details, see [TECHNICAL-CHANGELOG.md](TECHNICAL-CHANGELOG.md).
 
+## 1.3.0
+- Improved automatic update support for versioned GitHub release packages.
+- Improved the WordPress update details window with separate Description and Changelog information.
+- Improved updater reliability and compatibility.
+
 ## 1.2.1
 
 - Updated the installation and update documentation for packaged GitHub releases.

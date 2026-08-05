@@ -9,14 +9,14 @@
  * @copyright Copyright (c) 2026 Big Red SEO
  * @license   GPL-2.0-or-later
  * @link      https://bigredseo.com/
- * @version   1.1.0
+ * @version   1.2.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
 if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 	final class BRS_Public_GitHub_Updater {
-		public const VERSION = '1.1.0';
+		public const VERSION = '1.2.0';
 
 		private const CACHE_TTL = 6 * HOUR_IN_SECONDS;
 		private const ERROR_CACHE_TTL = 15 * MINUTE_IN_SECONDS;
@@ -24,6 +24,7 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 		private string $plugin_file;
 		private string $plugin_basename;
 		private string $slug;
+		private string $description;
 		private string $owner;
 		private string $repository;
 		private string $asset_name;
@@ -50,7 +51,7 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 		 *   normalized release version.
 		 *
 		 * Optional arguments:
-		 * - slug, name, author, homepage, requires_php, requires_wp, tested_wp.
+		 * - slug, name, author, homepage, description,requires_php, requires_wp, tested_wp.
 		 */
 		public static function register( array $args ): ?self {
 			try {
@@ -120,6 +121,7 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 			$this->name            = sanitize_text_field( $args['name'] ?? $this->repository );
 			$this->author          = wp_kses_post( $args['author'] ?? 'Big Red SEO' );
 			$this->homepage        = esc_url_raw( $args['homepage'] ?? $this->repository_url );
+			$this->description     = wp_kses_post( $args['description'] ?? '' );
 			$this->requires_php    = sanitize_text_field( $args['requires_php'] ?? '' );
 			$this->requires_wp     = sanitize_text_field( $args['requires_wp'] ?? '' );
 			$this->tested_wp       = sanitize_text_field( $args['tested_wp'] ?? '' );
@@ -178,7 +180,7 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 					'id'           => $this->update_uri,
 					'slug'         => $this->slug,
 					'plugin'       => $this->plugin_basename,
-					'new_version'  => $latest_version,
+					'version'      => $latest_version,
 					'url'          => $this->repository_url,
 					'package'      => $package,
 					'icons'        => array(),
@@ -219,8 +221,8 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 				return $result;
 			}
 
-			$version     = $this->normalize_version( (string) $release['tag_name'] );
-			$description = isset( $release['body'] ) && is_string( $release['body'] )
+			$version   = $this->normalize_version( (string) $release['tag_name'] );
+			$changelog = isset( $release['body'] ) && is_string( $release['body'] )
 				? nl2br( esc_html( $release['body'] ) )
 				: '';
 
@@ -237,8 +239,8 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 					'download_link' => $package,
 					'external'      => true,
 					'sections'      => array(
-						'description' => $description,
-						'changelog'   => $description,
+						'description' => $this->description,
+						'changelog'   => $changelog,
 					),
 				)
 			);
@@ -357,7 +359,7 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 				self::ERROR_CACHE_TTL
 			);
 		}
-		
+
 		/**
 		 * Locate the configured ZIP asset in the release response.
 		 */

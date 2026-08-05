@@ -2,6 +2,20 @@
 
 Detailed, developer-facing change history. For a plain-language summary, see [CHANGELOG.md](CHANGELOG.md).
 
+## 1.3.0
+
+- Updated the bundled BRS Public GitHub Updater class.
+- Added support for `{version}` placeholders in GitHub release asset filenames.
+- Changed update metadata to return the required `version` field to WordPress.
+- Added configurable plugin description content for the update details modal.
+- Separated the Description and Changelog sections in the WordPress plugin information response.
+- Added six-hour caching for successful GitHub release responses.
+- Added 15-minute caching for failed GitHub release requests.
+- Added nonfatal updater registration error handling.
+- Added explicit optional-value filtering instead of relying on unqualified `array_filter()`.
+- Set the embedded updater filters to priority `20` so the BRS central updater can take precedence at priority `10`.
+- Improved validation of configured ZIP asset filename patterns.
+
 ## 1.2.1
 
 - Replaced the previous manual installation instructions in `README.md` with installation instructions for the packaged release ZIP.
