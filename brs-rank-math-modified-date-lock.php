@@ -30,7 +30,11 @@ if ( class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 			'asset_name'  => 'brs-rank-math-modified-date-lock-{version}.zip',
 			'slug'        => 'brs-rank-math-modified-date-lock',
 			'name'        => 'Rank Math Modified Date Lock',
-			'description' => 'Automatically enables Rank Math SEO\'s Lock Modified Date option when the WordPress block editor loads.',
+			'description' => '
+			<p>Rank Math Modified Date Lock automatically enables Rank Math SEO\'s Lock Modified Date option when the WordPress block editor loads.</p>
+			<p>This helps prevent minor content edits from unintentionally changing a post or page\'s modified date. Editors can still disable the option before saving when the modified date should be updated.</p>
+			<p>Rank Math SEO must be installed and active. The plugin has no separate settings screen.</p>
+			',
 			'author'      => 'Big Red SEO',
 			'homepage'    => 'https://www.bigredseo.com/rankmath-modified-date-lock-default/',
 		)
