@@ -27,7 +27,7 @@ if ( class_exists( 'BRS_Public_GitHub_Updater' ) ) {
 			'plugin_file' => __FILE__,
 			'owner'       => 'bigredseo',
 			'repository'  => 'brs-rank-math-modified-date-lock',
-			'asset_name'  => 'brs-rank-math-modified-date-lock.zip',
+			'asset_name' => 'brs-rank-math-modified-date-lock-{version}.zip',
 			'slug'        => 'brs-rank-math-modified-date-lock',
 			'name'        => 'Rank Math Modified Date Lock',
 			'author'      => 'Big Red SEO',

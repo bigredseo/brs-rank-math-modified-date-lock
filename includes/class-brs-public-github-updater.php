@@ -9,16 +9,17 @@
  * @copyright Copyright (c) 2026 Big Red SEO
  * @license   GPL-2.0-or-later
  * @link      https://bigredseo.com/
- * @version   1.0.0
+ * @version   1.1.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
 if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 	final class BRS_Public_GitHub_Updater {
-        public const VERSION = '1.0.0';
+		public const VERSION = '1.1.0';
 
 		private const CACHE_TTL = 6 * HOUR_IN_SECONDS;
+		private const ERROR_CACHE_TTL = 15 * MINUTE_IN_SECONDS;
 
 		private string $plugin_file;
 		private string $plugin_basename;
@@ -44,13 +45,28 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 		 * - plugin_file: Main plugin file, normally __FILE__.
 		 * - owner: GitHub repository owner.
 		 * - repository: GitHub repository name.
-		 * - asset_name: Exact ZIP asset attached to each GitHub release.
+		 * - asset_name: ZIP asset filename or pattern attached to each GitHub
+		 *   release. The optional {version} placeholder is replaced with the
+		 *   normalized release version.
 		 *
 		 * Optional arguments:
 		 * - slug, name, author, homepage, requires_php, requires_wp, tested_wp.
 		 */
-		public static function register( array $args ): self {
-			return new self( $args );
+		public static function register( array $args ): ?self {
+			try {
+				return new self( $args );
+			} catch ( InvalidArgumentException $exception ) {
+				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+					error_log(
+						sprintf(
+							'BRS GitHub updater configuration error: %s',
+							$exception->getMessage()
+						)
+					);
+				}
+
+				return null;
+			}
 		}
 
 		private function __construct( array $args ) {
@@ -69,9 +85,26 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 			$this->slug            = sanitize_key(
 				$args['slug'] ?? dirname( $this->plugin_basename )
 			);
-			$this->owner           = preg_replace( '/[^A-Za-z0-9_.-]/', '', $args['owner'] );
-			$this->repository      = preg_replace( '/[^A-Za-z0-9_.-]/', '', $args['repository'] );
-			$this->asset_name      = sanitize_file_name( $args['asset_name'] );
+			$this->owner = preg_replace( '/[^A-Za-z0-9_.-]/', '', $args['owner'] );
+			$this->repository = preg_replace( '/[^A-Za-z0-9_.-]/', '', $args['repository'] );
+			$this->asset_name = trim( $args['asset_name'] );
+
+			$validation_name = str_replace(
+				'{version}',
+				'1.0.0',
+				$this->asset_name
+			);
+
+			if (
+				'' === $this->asset_name
+				|| basename( $validation_name ) !== $validation_name
+				|| ! str_ends_with( strtolower( $validation_name ), '.zip' )
+			) {
+				throw new InvalidArgumentException(
+					'The updater asset_name must be a ZIP filename without a directory path.'
+				);
+			}
+
 			$this->update_uri      = sprintf(
 				'https://github.com/%s/%s',
 				$this->owner,
@@ -91,8 +124,8 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 			$this->requires_wp     = sanitize_text_field( $args['requires_wp'] ?? '' );
 			$this->tested_wp       = sanitize_text_field( $args['tested_wp'] ?? '' );
 
-			add_filter( 'update_plugins_github.com', array( $this, 'filter_update' ), 10, 4 );
-			add_filter( 'plugins_api', array( $this, 'filter_plugin_information' ), 10, 3 );
+			add_filter( 'update_plugins_github.com', array( $this, 'filter_update' ), 20, 4 );
+			add_filter( 'plugins_api', array( $this, 'filter_plugin_information' ), 20, 3 );
 			add_action( 'upgrader_process_complete', array( $this, 'clear_cache_after_update' ), 10, 2 );
 		}
 
@@ -140,7 +173,7 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 				return false;
 			}
 
-			return array_filter(
+			return $this->remove_empty_optional_values(
 				array(
 					'id'           => $this->update_uri,
 					'slug'         => $this->slug,
@@ -188,10 +221,10 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 
 			$version     = $this->normalize_version( (string) $release['tag_name'] );
 			$description = isset( $release['body'] ) && is_string( $release['body'] )
-				? wpautop( esc_html( $release['body'] ) )
+				? nl2br( esc_html( $release['body'] ) )
 				: '';
 
-			return (object) array_filter(
+			return (object) $this->remove_empty_optional_values(
 				array(
 					'name'          => $this->name,
 					'slug'          => $this->slug,
@@ -234,6 +267,18 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 		 */
 		private function get_release() {
 			$cached = get_site_transient( $this->cache_key );
+
+			if (
+				is_array( $cached )
+				&& isset( $cached['brs_error'] )
+				&& true === $cached['brs_error']
+			) {
+				return new WP_Error(
+					'brs_github_release_cached_error',
+					'GitHub release data is temporarily unavailable.'
+				);
+			}
+
 			if ( is_array( $cached ) ) {
 				return $cached;
 			}
@@ -245,55 +290,135 @@ if ( ! class_exists( 'BRS_Public_GitHub_Updater', false ) ) {
 					'headers' => array(
 						'Accept'               => 'application/vnd.github+json',
 						'X-GitHub-Api-Version' => '2022-11-28',
-						'User-Agent'           => sprintf( '%s WordPress updater', $this->slug ),
+						'User-Agent'           => sprintf(
+							'%s WordPress updater',
+							$this->slug
+						),
 					),
 				)
 			);
 
 			if ( is_wp_error( $response ) ) {
+				$this->cache_release_error();
+
 				return $response;
 			}
 
 			$status = wp_remote_retrieve_response_code( $response );
+
 			if ( 200 !== $status ) {
+				$this->cache_release_error();
+
 				return new WP_Error(
 					'brs_github_release_http_error',
-					sprintf( 'GitHub release request returned HTTP %d.', $status )
+					sprintf(
+						'GitHub release request returned HTTP %d.',
+						$status
+					)
 				);
 			}
 
-			$data = json_decode( wp_remote_retrieve_body( $response ), true );
-			if ( ! is_array( $data ) || empty( $data['tag_name'] ) || empty( $data['html_url'] ) ) {
+			$data = json_decode(
+				wp_remote_retrieve_body( $response ),
+				true
+			);
+
+			if (
+				! is_array( $data )
+				|| empty( $data['tag_name'] )
+				|| empty( $data['html_url'] )
+			) {
+				$this->cache_release_error();
+
 				return new WP_Error(
 					'brs_github_release_invalid',
 					'GitHub returned invalid release data.'
 				);
 			}
 
-			set_site_transient( $this->cache_key, $data, self::CACHE_TTL );
+			set_site_transient(
+				$this->cache_key,
+				$data,
+				self::CACHE_TTL
+			);
 
 			return $data;
 		}
 
 		/**
+		 * Briefly cache a failed GitHub release request.
+		 */
+		private function cache_release_error(): void {
+			set_site_transient(
+				$this->cache_key,
+				array(
+					'brs_error' => true,
+				),
+				self::ERROR_CACHE_TTL
+			);
+		}
+		
+		/**
 		 * Locate the configured ZIP asset in the release response.
 		 */
 		private function find_release_asset_url( array $release ): string {
-			if ( empty( $release['assets'] ) || ! is_array( $release['assets'] ) ) {
+			if (
+				empty( $release['assets'] )
+				|| ! is_array( $release['assets'] )
+				|| empty( $release['tag_name'] )
+				|| ! is_string( $release['tag_name'] )
+			) {
 				return '';
 			}
 
+			$version = $this->normalize_version( $release['tag_name'] );
+
+			if ( '' === $version ) {
+				return '';
+			}
+
+			$expected_asset_name = str_replace(
+				'{version}',
+				$version,
+				$this->asset_name
+			);
+
 			foreach ( $release['assets'] as $asset ) {
 				if (
-					is_array( $asset )
-					&& isset( $asset['name'], $asset['browser_download_url'] )
-					&& $this->asset_name === $asset['name']
+					! is_array( $asset )
+					|| ! isset(
+						$asset['name'],
+						$asset['browser_download_url']
+					)
+					|| ! is_string( $asset['name'] )
+					|| ! is_string( $asset['browser_download_url'] )
 				) {
-					return esc_url_raw( $asset['browser_download_url'] );
+					continue;
+				}
+
+				if ( $expected_asset_name === $asset['name'] ) {
+					return esc_url_raw(
+						$asset['browser_download_url']
+					);
 				}
 			}
 
 			return '';
+		}
+
+		/**
+		 * Remove only empty optional values.
+		 *
+		 * @param array $data Data to filter.
+		 * @return array
+		 */
+		private function remove_empty_optional_values( array $data ): array {
+			return array_filter(
+				$data,
+				static function ( $value ): bool {
+					return null !== $value && '' !== $value;
+				}
+			);
 		}
 
 		/**
