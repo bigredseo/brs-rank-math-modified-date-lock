@@ -2,6 +2,18 @@
 
 Detailed, developer-facing change history. For a plain-language summary, see [CHANGELOG.md](CHANGELOG.md).
 
+## 1.2.0
+
+- Added `includes/class-brs-public-github-updater.php`.
+- Registered the plugin with `BRS_Public_GitHub_Updater`.
+- Added the GitHub repository as the plugin `Update URI`.
+- Added the GitHub repository as the plugin `Plugin URI`.
+- Configured the updater to use published GitHub releases rather than repository commits.
+- Configured the expected release asset filename as `brs-rank-math-modified-date-lock.zip`.
+- Added support for WordPress’s external plugin update and plugin-information APIs.
+- Added transient caching for GitHub release responses and temporary caching for failed API requests.
+- Added compatibility behavior allowing the embedded updater to coexist with the BRS central GitHub update manager.
+
 
 ## [1.1.2] - 2026-08-04
 ### Changed

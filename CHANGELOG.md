@@ -2,6 +2,11 @@
 
 For full technical details, see [TECHNICAL-CHANGELOG.md](TECHNICAL-CHANGELOG.md).
 
+## 1.2.0
+
+- Added automatic update support for releases published in the plugin’s public GitHub repository.
+- Added the reusable BRS Public GitHub Updater class.
+
 ## [1.1.2] - 2026-08-04
 - Renamed the plugin to "Rank Math Modified Date Lock" and moved it into its own dedicated plugin folder, no longer usable via functions.php, mu-plugins, or a code snippet plugin.
 - The plugin now requires Rank Math SEO to be active before it can be activated, and will deactivate itself if Rank Math is later turned off.
