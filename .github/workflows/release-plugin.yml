@@ -179,9 +179,55 @@ jobs:
             exit 1
           fi
 
-          cp CHANGELOG.md "$RELEASE_NOTES"
+          SERIES="${VERSION%.*}"
 
-          echo "RELEASE_NOTES=$RELEASE_NOTES" >> "$GITHUB_ENV"         
+          awk -v series="$SERIES" '
+            function heading_version(line, token, cleaned, parts) {
+              if (line !~ /^##[[:space:]]+\[?[0-9]+\.[0-9]+\.[0-9]+\]?([[:space:]]+-|[[:space:]]*$)/) {
+                return ""
+              }
+              token = $2
+              gsub(/^\[/, "", token)
+              gsub(/\]$/, "", token)
+              return token
+            }
+            {
+              version = heading_version($0)
+              if (version != "") {
+                split(version, parts, ".")
+                heading_series = parts[1] "." parts[2]
+
+                if (heading_series == series) {
+                  started = 1
+                  print
+                  next
+                }
+
+                if (started) {
+                  exit
+                }
+              }
+
+              if (started) {
+                print
+              }
+            }
+          ' CHANGELOG.md > "$RELEASE_NOTES"
+
+          if [[ ! -s "$RELEASE_NOTES" ]]; then
+            echo "::error::No CHANGELOG.md entries found for release series $SERIES.x"
+            echo "::error::Expected headings such as: ## $VERSION - YYYY-MM-DD - Release Title"
+            exit 1
+          fi
+
+          if ! grep -Eq "^##[[:space:]]+\[?$VERSION\]?([[:space:]]+-|[[:space:]]*$)" "$RELEASE_NOTES"; then
+            echo "::error::CHANGELOG.md does not contain an entry for the current plugin version $VERSION"
+            exit 1
+          fi
+
+          echo "Release notes include CHANGELOG.md series: $SERIES.x"
+          cat "$RELEASE_NOTES"
+          echo "RELEASE_NOTES=$RELEASE_NOTES" >> "$GITHUB_ENV"
 
       - name: Create tag and GitHub Release
         env:

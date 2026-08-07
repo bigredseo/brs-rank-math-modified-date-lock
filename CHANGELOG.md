@@ -2,6 +2,10 @@
 
 For full technical details, see [TECHNICAL-CHANGELOG.md](TECHNICAL-CHANGELOG.md).
 
+## 1.3.1 - 2026-08-07 - BRS infrastructure update
+
+- Updated the GitHub release packaging and release-notes process.
+
 ## 1.3.0
 - Improved automatic update support for versioned GitHub release packages.
 - Improved the WordPress update details window with separate Description and Changelog information.
@@ -14,7 +18,7 @@ For full technical details, see [TECHNICAL-CHANGELOG.md](TECHNICAL-CHANGELOG.md)
 
 ## 1.2.0
 
-- Added automatic update support for releases published in the plugin’s public GitHub repository.
+- Added automatic update support for releases published in the pluginâ€™s public GitHub repository.
 - Added the reusable BRS Public GitHub Updater class.
 
 ## [1.1.2] - 2026-08-04

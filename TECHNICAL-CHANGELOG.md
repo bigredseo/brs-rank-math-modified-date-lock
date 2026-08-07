@@ -2,6 +2,10 @@
 
 Detailed, developer-facing change history. For a plain-language summary, see [CHANGELOG.md](CHANGELOG.md).
 
+## 1.3.1 - 2026-08-07 - BRS infrastructure update
+
+- Updated .github/workflows/release-plugin.yml to the current BRS release workflow using only the current major/minor CHANGELOG.md series for GitHub release notes.
+
 ## 1.3.0
 
 - Updated the bundled BRS Public GitHub Updater class.
@@ -19,10 +23,10 @@ Detailed, developer-facing change history. For a plain-language summary, see [CH
 ## 1.2.1
 
 - Replaced the previous manual installation instructions in `README.md` with installation instructions for the packaged release ZIP.
-- Documented the plugin’s automatic GitHub release update support.
+- Documented the pluginâ€™s automatic GitHub release update support.
 - Documented the required release asset filename and plugin directory structure.
 - Added links to the public Big Red SEO usage guide and the project changelog files.
-- Changed the plugin’s public-facing homepage to the Big Red SEO usage guide while retaining the GitHub repository as its `Update URI`.
+- Changed the pluginâ€™s public-facing homepage to the Big Red SEO usage guide while retaining the GitHub repository as its `Update URI`.
 
 ## 1.2.0
 
@@ -32,7 +36,7 @@ Detailed, developer-facing change history. For a plain-language summary, see [CH
 - Added the GitHub repository as the plugin `Plugin URI`.
 - Configured the updater to use published GitHub releases rather than repository commits.
 - Configured the expected release asset filename as `brs-rank-math-modified-date-lock.zip`.
-- Added support for WordPress’s external plugin update and plugin-information APIs.
+- Added support for WordPressâ€™s external plugin update and plugin-information APIs.
 - Added transient caching for GitHub release responses and temporary caching for failed API requests.
 - Added compatibility behavior allowing the embedded updater to coexist with the BRS central GitHub update manager.
 
